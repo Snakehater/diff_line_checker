@@ -66,6 +66,16 @@ int main(int argc, char *argv[]) {
 				eofs[i] = true;
 			}
 		}
+		// check so files aren't eof, if they are, quit
+		compActive = false;
+		for (int j = 0; j < file_sum; j++) {
+			if (eofs[j] == false) {
+				compActive = true;
+				break;
+			}
+		}
+		if (!compActive)
+			break;
 		row++;
 		std::string leftBuf = "";
 		for (unsigned long int i = 0; i < 3 - std::to_string(row).length(); i++)			leftBuf += ' ';
@@ -120,14 +130,6 @@ int main(int argc, char *argv[]) {
 				*outbufs[j] += (*linebufs[j])[i];
 				// reset for next character
 				*outbufs[j] += RESET;
-			}
-		}
-		// check so files aren't eof, if they are, quit
-		compActive = false;
-		for (int j = 0; j < file_sum; j++) {
-			if (eofs[j] == false) {
-				compActive = true;
-				break;
 			}
 		}
 
