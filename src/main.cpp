@@ -11,11 +11,32 @@ std::string f2_path = "res/younes.txt";
 std::vector<std::string> f_paths;
 
 int main(int argc, char *argv[]) {
+	int chunks = 0;
+	int chunk_counter = 0;
 	if (argc == 1) {
-		std::cout << "No files specified" << std::endl;
+		std::cout << "Usage: linediff [--chunks num] FILE..." << std::endl;
 		exit(-1);
 	}
-	int file_sum = argc - 1;
+	if (!strcmp(argv[1], "--chunks")) {
+		if (argc == 2)
+		{
+			std::cout << "Usage: linediff [--chunks num] FILE..." << std::endl;
+			exit(-1);
+		}
+		chunks = std::atoi(argv[2]);
+		if (chunks < 0)
+		{
+			std::cout << "Chunks must be a positive number" << std::endl;
+			exit(-1);
+		}
+		else if (chunks == 0)
+		{
+			std::cout << "Chunks must not be 0" << std::endl;
+			std::cout << "Usage: linediff [--chunks num] FILE..." << std::endl;
+			exit(-1);
+		}
+	}
+	int file_sum = argc - (chunks ? 3 : 1);
 	// print info
 	//std::vector<std::string> splitted_f1 = split(f1_path, "/");
 	//std::vector<std::string> splitted_f2 = split(f2_path, "/");
@@ -34,7 +55,7 @@ int main(int argc, char *argv[]) {
 	std::vector<std::string*> linebufs;
 	std::vector<bool> eofs;
 
-	for (int i = 1; i < argc; i++) {
+	for (int i = (chunks ? 3 : 1); i < argc; i++) {
 		std::ifstream* f1 = new std::ifstream(argv[i]);
 		f_streams.push_back(f1);
 
@@ -50,6 +71,7 @@ int main(int argc, char *argv[]) {
 
 	int row = 0;
 	bool compActive = true;
+	unsigned long int linelen_tot = 0;
 	while (compActive) {
 		// fill outbufs
 		std::vector<std::string*> outbufs;
@@ -82,12 +104,16 @@ int main(int argc, char *argv[]) {
 
 		for (std::string* s : outbufs)
 			*s += leftBuf + std::to_string(row) + " |";
+
+		linelen_tot = outbufs[0]->length();
 		
 		long unsigned int line_len = 0;
 		for (std::string* l : linebufs) {
 			if (line_len < l->length())
 				line_len = l->length();
 		}
+
+		linelen_tot += line_len;
 
 		// compare
 		for (long unsigned int i = 0; i < line_len; i++) {
@@ -138,6 +164,22 @@ int main(int argc, char *argv[]) {
 			std::cout << *s << std::endl;
 		std::cout << std::endl;
 
+		// Draw chunk borders
+		if (chunks)
+		{
+			if (++chunk_counter >= chunks)
+			{
+				std::cout << BOLDRED;
+				std::cout << " " + std::to_string(row / chunks) + "^ ";
+				for (long unsigned int i = 0; i < linelen_tot - std::to_string(row / chunks).length() - std::to_string((row / chunks) + 1).length() - 6; i++)
+				{
+					std::cout << '#';
+				}
+				std::cout << " " + std::to_string((row / chunks) + 1) + "v ";
+				std::cout << RESET << std::endl << std::endl;
+				chunk_counter = 0;
+			}
+		}
 	}
 }
 
