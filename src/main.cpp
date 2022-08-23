@@ -170,12 +170,12 @@ int main(int argc, char *argv[]) {
 			if (++chunk_counter >= chunks)
 			{
 				std::cout << BOLDRED;
-				std::cout << " " + std::to_string(row / chunks) + "^ ";
-				for (long unsigned int i = 0; i < linelen_tot - std::to_string(row / chunks).length() - std::to_string((row / chunks) + 1).length() - 6; i++)
+				std::cout << " " + std::to_string((row / chunks) - 1) + "^ ";
+				for (long unsigned int i = 0; i < linelen_tot - std::to_string(row / chunks).length() - std::to_string((row / chunks) - 1).length() - 6; i++)
 				{
 					std::cout << '#';
 				}
-				std::cout << " " + std::to_string((row / chunks) + 1) + "v ";
+				std::cout << " " + std::to_string(row / chunks) + "v ";
 				std::cout << RESET << std::endl << std::endl;
 				chunk_counter = 0;
 			}
